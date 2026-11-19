@@ -1,0 +1,49 @@
+// use prisma-8
+
+model Client {
+  id         Int        @id @default(autoincrement())
+  name       String
+  phone      String?
+  notes      String?
+  createdAt  DateTime   @default(now())
+  shipments  Shipment[]
+  payments   Payment[]
+}
+
+model Shipment {
+  id             Int       @id @default(autoincrement())
+  clientId       Int
+  client         Client    @relation(fields: [clientId], references: [id])
+  goods          String
+  shippingMark   String?
+  productCostRmb Float
+  exchangeRate   Float
+  freightGhs     Float
+  dutyGhs        Float
+  clientQuoteGhs Float
+  status         String    @default("Quoted")
+  shippedDate    DateTime?
+  deliveredDate  DateTime?
+  delivered      Boolean   @default(false)
+  invoiceUrl     String?
+  createdAt      DateTime  @default(now())
+  expenses       Expense[]
+}
+
+model Expense {
+  id         Int       @id @default(autoincrement())
+  category   String
+  amountGhs  Float
+  note       String?
+  createdAt  DateTime  @default(now())
+  shipmentId Int?
+  shipment   Shipment? @relation(fields: [shipmentId], references: [id])
+}
+
+model Payment {
+  id        Int      @id @default(autoincrement())
+  clientId  Int
+  client    Client   @relation(fields: [clientId], references: [id])
+  amountGhs Float
+  createdAt DateTime @default(now())
+}
