@@ -5,9 +5,6 @@ import { db } from "@/lib/db";
 function calcProfit(s: any) {
   return (s.clientQuoteGhs ?? 0) - (s.productCostGhs ?? 0);
 }
-function calcProfit(s: any) {
-  return s.clientQuoteGhs - calcLanded(s);
-}
 
 export default async function AnalyticsPage() {
   const shipments = await db.orm.public.Shipment.all();
