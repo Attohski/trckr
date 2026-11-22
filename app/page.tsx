@@ -3,9 +3,11 @@ export const dynamic = "force-dynamic";
 import { db } from "@/lib/db";
 import { addShipment, addExpense, addPayment } from "./actions";
 
-function calcProfit(s: any) {
-  const landed = s.productCostRmb * s.exchangeRate + s.freightGhs + s.dutyGhs;
-  return s.clientQuoteGhs - landed;
+function calcLanded(s: any) {
+  return s.productCostGhs + s.freightGhs + s.dutyGhs;
+}
+function calcMargin(s: any) {
+  return s.clientQuoteGhs - calcLanded(s);
 }
 
 export default async function Home() {
@@ -14,23 +16,25 @@ export default async function Home() {
   const payments = await db.orm.public.Payment.orderBy((p) => p.createdAt.desc()).all();
   const clients = await db.orm.public.Client.all();
 
-  const totalProfit = shipments.reduce((sum, s) => sum + calcProfit(s), 0);
+  const clientMap = new Map<number, string>();
+  clients.forEach((c: any) => clientMap.set(c.id, c.name));
+
+  const grossProfit = shipments.reduce((sum, s) => sum + calcMargin(s), 0);
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amountGhs, 0);
   const totalPayments = payments.reduce((sum, p) => sum + p.amountGhs, 0);
-  const netPosition = totalProfit - totalExpenses;
+  const netProfit = grossProfit - totalExpenses;
 
   return (
     <div className="min-h-screen bg-white text-black">
-      {/* Header */}
       <header className="border-b border-black">
         <div className="max-w-6xl mx-auto px-6 py-6 flex items-end justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">trckr — Dashboard</h1>
-            <p className="text-sm text-neutral-500 mt-1">China → Ghana · Shipments, expenses & profit</p>
+            <p className="text-sm text-neutral-500 mt-1">China to Ghana · All amounts in GH₵</p>
           </div>
           <div className="text-right">
-            <p className="text-xs uppercase tracking-widest text-neutral-500">Net Position</p>
-            <p className="text-2xl font-semibold tabular-nums">GH₵ {netPosition.toFixed(2)}</p>
+            <p className="text-xs uppercase tracking-widest text-neutral-500">Net Profit (after expenses)</p>
+            <p className="text-2xl font-semibold tabular-nums">GH₵ {netProfit.toFixed(2)}</p>
           </div>
         </div>
       </header>
@@ -38,21 +42,26 @@ export default async function Home() {
       <main className="max-w-6xl mx-auto px-6 py-10 space-y-12">
         {/* Summary */}
         <section>
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-neutral-200 border border-black">
+          <div className="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-neutral-200 border border-black">
             <div className="p-6">
-              <p className="text-xs uppercase tracking-widest text-neutral-500">Total Profit</p>
-              <p className="text-3xl font-semibold tabular-nums mt-2">GH₵ {totalProfit.toFixed(2)}</p>
+              <p className="text-xs uppercase tracking-widest text-neutral-500">Gross Profit</p>
+              <p className="text-3xl font-semibold tabular-nums mt-2">GH₵ {grossProfit.toFixed(2)}</p>
               <p className="text-xs text-neutral-500 mt-1">{shipments.length} shipments</p>
             </div>
             <div className="p-6">
-              <p className="text-xs uppercase tracking-widest text-neutral-500">Total Expenses</p>
+              <p className="text-xs uppercase tracking-widest text-neutral-500">Expenses</p>
               <p className="text-3xl font-semibold tabular-nums mt-2">GH₵ {totalExpenses.toFixed(2)}</p>
               <p className="text-xs text-neutral-500 mt-1">{expenses.length} records</p>
             </div>
             <div className="p-6">
-              <p className="text-xs uppercase tracking-widest text-neutral-500">Payments Received</p>
+              <p className="text-xs uppercase tracking-widest text-neutral-500">Payments In</p>
               <p className="text-3xl font-semibold tabular-nums mt-2">GH₵ {totalPayments.toFixed(2)}</p>
               <p className="text-xs text-neutral-500 mt-1">{payments.length} payments</p>
+            </div>
+            <div className="p-6">
+              <p className="text-xs uppercase tracking-widest text-neutral-500">Net Profit</p>
+              <p className="text-3xl font-semibold tabular-nums mt-2">GH₵ {netProfit.toFixed(2)}</p>
+              <p className="text-xs text-neutral-500 mt-1">gross − expenses</p>
             </div>
           </div>
         </section>
@@ -73,15 +82,8 @@ export default async function Home() {
               </select>
               <input name="goods" placeholder="Goods Description" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
               <input name="shippingMark" placeholder="Shipping Mark (optional)" className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
-              <div className="grid grid-cols-2 gap-3">
-                <input name="productCostRmb" type="number" step="0.01" placeholder="Cost (RMB)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                <input name="exchangeRate" type="number" step="0.01" placeholder="Rate" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <input name="freightGhs" type="number" step="0.01" placeholder="Freight (GHS)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                <input name="dutyGhs" type="number" step="0.01" placeholder="Duty (GHS)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
-              </div>
-              <input name="clientQuoteGhs" type="number" step="0.01" placeholder="Client Quote (GHS)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
+              <input name="productCostGhs" type="number" step="0.01" placeholder="Product Cost (GH₵)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
+              <input name="clientQuoteGhs" type="number" step="0.01" placeholder="Client Quote (GH₵)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
               <button type="submit" className="w-full bg-black text-white text-sm font-medium px-4 py-2.5 hover:bg-neutral-800 transition-colors">
                 Add Shipment
               </button>
@@ -95,7 +97,7 @@ export default async function Home() {
             </div>
             <form action={addExpense} className="p-5 space-y-3">
               <input name="category" placeholder="Category (e.g. Freight)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
-              <input name="amountGhs" type="number" step="0.01" placeholder="Amount (GHS)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
+              <input name="amountGhs" type="number" step="0.01" placeholder="Amount (GH₵)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
               <input name="note" placeholder="Note (optional)" className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
               <button type="submit" className="w-full bg-black text-white text-sm font-medium px-4 py-2.5 hover:bg-neutral-800 transition-colors">
                 Add Expense
@@ -115,7 +117,7 @@ export default async function Home() {
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
-              <input name="amountGhs" type="number" step="0.01" placeholder="Amount (GHS)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
+              <input name="amountGhs" type="number" step="0.01" placeholder="Amount (GH₵)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
               <button type="submit" className="w-full bg-black text-white text-sm font-medium px-4 py-2.5 hover:bg-neutral-800 transition-colors">
                 Add Payment
               </button>
@@ -138,25 +140,23 @@ export default async function Home() {
                   <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-widest text-neutral-500">
                     <th className="px-5 py-3 font-medium">Client</th>
                     <th className="px-5 py-3 font-medium">Goods</th>
-                    <th className="px-5 py-3 font-medium text-right">Landed Cost</th>
-                    <th className="px-5 py-3 font-medium text-right">Quote</th>
-                    <th className="px-5 py-3 font-medium text-right">Profit</th>
+                    <th className="px-5 py-3 font-medium text-right">Landed (GH₵)</th>
+                    <th className="px-5 py-3 font-medium text-right">Quote (GH₵)</th>
+                    <th className="px-5 py-3 font-medium text-right">Profit (GH₵)</th>
                     <th className="px-5 py-3 font-medium">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {shipments.map((s: any) => {
-                    const landed = s.productCostRmb * s.exchangeRate + s.freightGhs + s.dutyGhs;
-                    const profit = calcProfit(s);
+                    const landed = calcLanded(s);
+                    const profit = calcMargin(s);
                     return (
                       <tr key={s.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
-                        <td className="px-5 py-3 font-medium">{s.client?.name ?? "—"}</td>
+                        <td className="px-5 py-3 font-medium">{clientMap.get(s.clientId) ?? "—"}</td>
                         <td className="px-5 py-3 text-neutral-600">{s.goods}</td>
-                        <td className="px-5 py-3 text-right tabular-nums text-neutral-600">GH₵ {landed.toFixed(2)}</td>
-                        <td className="px-5 py-3 text-right tabular-nums text-neutral-600">GH₵ {s.clientQuoteGhs.toFixed(2)}</td>
-                        <td className="px-5 py-3 text-right tabular-nums font-semibold">
-                          GH₵ {profit.toFixed(2)}
-                        </td>
+                        <td className="px-5 py-3 text-right tabular-nums text-neutral-600">{landed.toFixed(2)}</td>
+                        <td className="px-5 py-3 text-right tabular-nums text-neutral-600">{s.clientQuoteGhs.toFixed(2)}</td>
+                        <td className="px-5 py-3 text-right tabular-nums font-semibold">{profit.toFixed(2)}</td>
                         <td className="px-5 py-3">
                           <span className="inline-block border border-neutral-300 text-neutral-700 text-xs px-2 py-0.5">{s.status}</span>
                         </td>

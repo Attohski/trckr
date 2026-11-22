@@ -3,9 +3,11 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { db } from "@/lib/db";
 
-function calcProfit(s: any) {
-  const landed = s.productCostRmb * s.exchangeRate + s.freightGhs + s.dutyGhs;
-  return s.clientQuoteGhs - landed;
+function calcLanded(s: any) {
+  return s.productCostGhs + s.freightGhs + s.dutyGhs;
+}
+function calcMargin(s: any) {
+  return s.clientQuoteGhs - calcLanded(s);
 }
 
 export default async function ShipmentDetailPage({
@@ -21,21 +23,25 @@ export default async function ShipmentDetailPage({
     return <main className="p-10 text-neutral-500">Shipment not found.</main>;
   }
 
-  const client = await db.orm.public.Client.where({ id: shipment.clientId }).first();
-  const expenses = await db.orm.public.Expense.where({ shipmentId }).all();
-  const payments = client
-    ? await db.orm.public.Payment.where({ clientId: client.id }).all()
-    : [];
+  const clients = await db.orm.public.Client.all();
+  const clientMap = new Map<number, string>();
+  clients.forEach((c: any) => clientMap.set(c.id, c.name));
+  const clientName = clientMap.get(shipment.clientId) ?? "—";
 
-  const landed = shipment.productCostRmb * shipment.exchangeRate + shipment.freightGhs + shipment.dutyGhs;
-  const profit = calcProfit(shipment);
+  const expenses = await db.orm.public.Expense.where({ shipmentId }).all();
+  const payments = await db.orm.public.Payment.where({ clientId: shipment.clientId }).all();
+
+  const landed = calcLanded(shipment);
+  const profit = calcMargin(shipment);
   const totalExpenses = expenses.reduce((sum: number, e: any) => sum + e.amountGhs, 0);
   const totalPaid = payments.reduce((sum: number, p: any) => sum + p.amountGhs, 0);
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
       <div className="flex items-center gap-4 border-b border-black pb-4">
-        <Link href="/shipments" className="text-sm underline underline-offset-4">← Back</Link>
+        <Link href="/shipments" className="text-sm underline underline-offset-4 hover:opacity-60">
+          ← Back
+        </Link>
         <h1 className="text-2xl font-semibold tracking-tight">{shipment.goods}</h1>
       </div>
 
@@ -43,7 +49,7 @@ export default async function ShipmentDetailPage({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="border border-black p-4">
           <p className="text-xs uppercase tracking-widest text-neutral-500">Client</p>
-          <p className="font-medium mt-1">{client?.name ?? "—"}</p>
+          <p className="font-medium mt-1">{clientName}</p>
         </div>
         <div className="border border-black p-4">
           <p className="text-xs uppercase tracking-widest text-neutral-500">Landed Cost</p>
@@ -66,20 +72,16 @@ export default async function ShipmentDetailPage({
         </div>
         <dl className="divide-y divide-neutral-100 text-sm">
           <div className="flex justify-between px-5 py-3">
-            <dt className="text-neutral-500">Product Cost (RMB)</dt>
-            <dd className="tabular-nums">{shipment.productCostRmb.toFixed(2)}</dd>
+  <dt className="text-neutral-500">Product Cost</dt>
+  <dd className="tabular-nums">GH₵ {shipment.productCostGhs.toFixed(2)}</dd>
+</div>
+          <div className="flex justify-between px-5 py-3">
+            <dt className="text-neutral-500">Freight</dt>
+            <dd className="tabular-nums">GH₵ {shipment.freightGhs.toFixed(2)}</dd>
           </div>
           <div className="flex justify-between px-5 py-3">
-            <dt className="text-neutral-500">Exchange Rate</dt>
-            <dd className="tabular-nums">{shipment.exchangeRate}</dd>
-          </div>
-          <div className="flex justify-between px-5 py-3">
-            <dt className="text-neutral-500">Freight (GHS)</dt>
-            <dd className="tabular-nums">{shipment.freightGhs.toFixed(2)}</dd>
-          </div>
-          <div className="flex justify-between px-5 py-3">
-            <dt className="text-neutral-500">Duty/Clearing (GHS)</dt>
-            <dd className="tabular-nums">{shipment.dutyGhs.toFixed(2)}</dd>
+            <dt className="text-neutral-500">Duty / Clearing</dt>
+            <dd className="tabular-nums">GH₵ {shipment.dutyGhs.toFixed(2)}</dd>
           </div>
           <div className="flex justify-between px-5 py-3 font-semibold">
             <dt>Landed Cost</dt>
@@ -100,7 +102,10 @@ export default async function ShipmentDetailPage({
           <ul>
             {expenses.map((e: any) => (
               <li key={e.id} className="px-5 py-3 border-b border-neutral-100 flex justify-between text-sm">
-                <span>{e.category} {e.note && <span className="text-neutral-400">— {e.note}</span>}</span>
+                <span>
+                  {e.category}
+                  {e.note && <span className="text-neutral-400"> — {e.note}</span>}
+                </span>
                 <span className="tabular-nums">GH₵ {e.amountGhs.toFixed(2)}</span>
               </li>
             ))}
@@ -111,7 +116,7 @@ export default async function ShipmentDetailPage({
       {/* Payments from this Client */}
       <div className="border border-black">
         <div className="border-b border-black px-5 py-3 flex justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-widest">Payments from {client?.name}</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-widest">Payments from {clientName}</h2>
           <span className="text-xs text-neutral-500">Total: GH₵ {totalPaid.toFixed(2)}</span>
         </div>
         {payments.length === 0 ? (
@@ -130,13 +135,31 @@ export default async function ShipmentDetailPage({
 
       {/* Status & Dates */}
       <div className="border border-black p-5 text-sm space-y-2">
-        <div className="flex justify-between"><span className="text-neutral-500">Status</span><span>{shipment.status}</span></div>
-        <div className="flex justify-between"><span className="text-neutral-500">Shipped</span><span>{shipment.shippedDate ? new Date(shipment.shippedDate).toLocaleDateString() : "—"}</span></div>
-        <div className="flex justify-between"><span className="text-neutral-500">Delivered</span><span>{shipment.deliveredDate ? new Date(shipment.deliveredDate).toLocaleDateString() : "—"}</span></div>
-        <div className="flex justify-between"><span className="text-neutral-500">Invoice</span>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">Shipping Mark</span>
+          <span>{shipment.shippingMark || "—"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">Status</span>
+          <span>{shipment.status}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">Shipped</span>
+          <span>{shipment.shippedDate ? new Date(shipment.shippedDate).toLocaleDateString() : "—"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">Delivered</span>
+          <span>{shipment.deliveredDate ? new Date(shipment.deliveredDate).toLocaleDateString() : "—"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">Invoice</span>
           {shipment.invoiceUrl ? (
-            <a href={shipment.invoiceUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Download</a>
-          ) : <span>—</span>}
+            <a href={shipment.invoiceUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+              Download
+            </a>
+          ) : (
+            <span>—</span>
+          )}
         </div>
       </div>
     </main>

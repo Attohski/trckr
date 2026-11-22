@@ -2,9 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { db } from "@/lib/db";
 
-function calcProfit(s: any) {
-  const landed = s.productCostRmb * s.exchangeRate + s.freightGhs + s.dutyGhs;
-  return s.clientQuoteGhs - landed;
+function calcLanded(s: any) {
+  return s.productCostGhs + s.freightGhs + s.dutyGhs;
 }
 
 export default async function AnalyticsPage() {

@@ -16,8 +16,7 @@ model Shipment {
   client         Client    @relation(fields: [clientId], references: [id])
   goods          String
   shippingMark   String?
-  productCostRmb Float
-  exchangeRate   Float
+  productCostGhs Float
   freightGhs     Float
   dutyGhs        Float
   clientQuoteGhs Float

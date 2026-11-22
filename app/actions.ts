@@ -5,15 +5,11 @@ import { revalidatePath } from 'next/cache'
 import { put, del } from '@vercel/blob'
 
 export async function addShipment(formData: FormData) {
-  const rate = parseFloat(formData.get('exchangeRate') as string)
-  if (!rate || rate <= 0) throw new Error('Exchange rate must be greater than 0')
-
   await db.orm.public.Shipment.create({
     clientId: parseInt(formData.get('clientId') as string),
     goods: formData.get('goods') as string,
-    shippingMark: formData.get('shippingMark') as string || null,
-    productCostRmb: parseFloat(formData.get('productCostRmb') as string),
-    exchangeRate: rate,
+    shippingMark: (formData.get('shippingMark') as string) || null,
+    productCostGhs: parseFloat(formData.get('productCostGhs') as string),
     freightGhs: parseFloat(formData.get('freightGhs') as string),
     dutyGhs: parseFloat(formData.get('dutyGhs') as string),
     clientQuoteGhs: parseFloat(formData.get('clientQuoteGhs') as string),
@@ -23,10 +19,12 @@ export async function addShipment(formData: FormData) {
 }
 
 export async function addExpense(formData: FormData) {
+  const amount = parseFloat(formData.get('amountGhs') as string)
+  if (amount < 0) throw new Error('Amount cannot be negative')
   await db.orm.public.Expense.create({
     category: formData.get('category') as string,
-    amountGhs: parseFloat(formData.get('amountGhs') as string),
-    note: formData.get('note') as string || null,
+    amountGhs: amount,
+    note: (formData.get('note') as string) || null,
   })
   revalidatePath('/')
   revalidatePath('/expenses')
@@ -69,8 +67,8 @@ export async function updateShipment(formData: FormData) {
   await db.orm.public.Shipment.where({ id }).update({
     clientId: parseInt(formData.get('clientId') as string),
     goods: formData.get('goods') as string,
-    shippingMark: formData.get('shippingMark') as string || null,
-    productCostRmb: parseFloat(formData.get('productCostRmb') as string),
+    shippingMark: (formData.get('shippingMark') as string) || null,
+    productCostGhs: parseFloat(formData.get('productCostGhs') as string),
     exchangeRate: parseFloat(formData.get('exchangeRate') as string),
     freightGhs: parseFloat(formData.get('freightGhs') as string),
     dutyGhs: parseFloat(formData.get('dutyGhs') as string),
@@ -106,12 +104,8 @@ export async function uploadInvoice(formData: FormData) {
   const file = formData.get('invoice') as File
   const shipmentId = parseInt(formData.get('shipmentId') as string)
   if (!file || file.size === 0) return
-
   const blob = await put(`invoices/${shipmentId}-${file.name}`, file, { access: 'public' })
-
-  await db.orm.public.Shipment.where({ id: shipmentId }).update({
-    invoiceUrl: blob.url,
-  })
+  await db.orm.public.Shipment.where({ id: shipmentId }).update({ invoiceUrl: blob.url })
   revalidatePath('/shipments')
   revalidatePath('/')
 }
@@ -120,9 +114,7 @@ export async function deleteInvoice(formData: FormData) {
   const shipmentId = parseInt(formData.get('shipmentId') as string)
   const url = formData.get('url') as string
   if (url) await del(url)
-  await db.orm.public.Shipment.where({ id: shipmentId }).update({
-    invoiceUrl: null,
-  })
+  await db.orm.public.Shipment.where({ id: shipmentId }).update({ invoiceUrl: null })
   revalidatePath('/shipments')
   revalidatePath('/')
 }

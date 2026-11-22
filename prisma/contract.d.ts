@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'d55fe72871c51775480d1a7023461f01c288f3d41c1f358748d94e228fcbd1bb'>;
+  StorageHashBase<'6c83ab59bdf36d52da5afd751883b76c76c4bd88b9480e6916d91922bae855ab'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -343,12 +343,11 @@ export namespace Models {
     delivered: FieldOutputTypes['public']['Shipment']['delivered'];
     deliveredDate: FieldOutputTypes['public']['Shipment']['deliveredDate'];
     dutyGhs: FieldOutputTypes['public']['Shipment']['dutyGhs'];
-    exchangeRate: FieldOutputTypes['public']['Shipment']['exchangeRate'];
     freightGhs: FieldOutputTypes['public']['Shipment']['freightGhs'];
     goods: FieldOutputTypes['public']['Shipment']['goods'];
     id: FieldOutputTypes['public']['Shipment']['id'];
     invoiceUrl: FieldOutputTypes['public']['Shipment']['invoiceUrl'];
-    productCostRmb: FieldOutputTypes['public']['Shipment']['productCostRmb'];
+    productCostGhs: FieldOutputTypes['public']['Shipment']['productCostGhs'];
     shippedDate: FieldOutputTypes['public']['Shipment']['shippedDate'];
     shippingMark: FieldOutputTypes['public']['Shipment']['shippingMark'];
     status: FieldOutputTypes['public']['Shipment']['status'];
@@ -602,12 +601,6 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
-                readonly exchangeRate: {
-                  readonly dataType: 'pg/float8';
-                  readonly codecId: 'pg/float8@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
                 readonly freightGhs: {
                   readonly dataType: 'pg/float8';
                   readonly codecId: 'pg/float8@1';
@@ -636,7 +629,7 @@ type ContractBase = Omit<
                   readonly nullable: true;
                   readonly many: false;
                 };
-                readonly productCostRmb: {
+                readonly productCostGhs: {
                   readonly dataType: 'pg/float8';
                   readonly codecId: 'pg/float8@1';
                   readonly nullable: false;
@@ -914,10 +907,6 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
               };
-              readonly exchangeRate: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
-              };
               readonly freightGhs: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
@@ -934,7 +923,7 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly productCostRmb: {
+              readonly productCostGhs: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
               };
@@ -990,12 +979,11 @@ type ContractBase = Omit<
                 readonly delivered: { readonly column: 'delivered' };
                 readonly deliveredDate: { readonly column: 'deliveredDate' };
                 readonly dutyGhs: { readonly column: 'dutyGhs' };
-                readonly exchangeRate: { readonly column: 'exchangeRate' };
                 readonly freightGhs: { readonly column: 'freightGhs' };
                 readonly goods: { readonly column: 'goods' };
                 readonly id: { readonly column: 'id' };
                 readonly invoiceUrl: { readonly column: 'invoiceUrl' };
-                readonly productCostRmb: { readonly column: 'productCostRmb' };
+                readonly productCostGhs: { readonly column: 'productCostGhs' };
                 readonly shippedDate: { readonly column: 'shippedDate' };
                 readonly shippingMark: { readonly column: 'shippingMark' };
                 readonly status: { readonly column: 'status' };
