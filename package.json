@@ -1,4 +1,6 @@
 {
+"name": "trckr",
+  "version": "0.1.0",  
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -11,7 +13,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "8.0.0-rc.24"
+    "@prisma/client": "8.0.0-rc.24",
     "@prisma/extension-accelerate": "latest",
     "@prisma/orm-postgres": "^8.0.0-rc.24",
     "@vercel/blob": "^2.9.0",
