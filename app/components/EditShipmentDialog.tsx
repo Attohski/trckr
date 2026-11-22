@@ -28,8 +28,6 @@ export default function EditShipmentDialog({
               <input name="shippingMark" defaultValue={shipment.shippingMark || ""} placeholder="Shipping Mark" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
               <div className="grid grid-cols-2 gap-2">
                 <input name="productCostGhs" type="number" step="0.01" defaultValue={shipment.productCostGhs} required className="w-full border border-neutral-300 rounded-lg px-3 py-2 text-sm" />
-                <input name="freightGhs" type="number" step="0.01" defaultValue={shipment.freightGhs} required className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-                <input name="dutyGhs" type="number" step="0.01" defaultValue={shipment.dutyGhs} required className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
               </div>
               <input name="clientQuoteGhs" type="number" step="0.01" defaultValue={shipment.clientQuoteGhs} required className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
               <select name="status" defaultValue={shipment.status} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
