@@ -7,29 +7,21 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "prisma generate --no-engine"
+    "postinstall": "prisma contract emit"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "8.0.0-rc.24",
-    "@prisma/extension-accelerate": "latest",
-    "@prisma/orm-postgres": "^8.0.0-rc.24",
-    "@vercel/blob": "^2.9.0",
-    "next": "latest",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "temporal-polyfill": "^1.0.8"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "postcss": "^8",
-    "prisma": "8.0.0-rc.24",
-    "tailwindcss": "^3.4.1",
-    "tsx": "^4.19.2",
-    "typescript": "^5"
-  }
+  "@prisma/orm-postgres": "latest",
+  "@vercel/blob": "^0.27.0",
+  "next": "16.4.6",
+  "react": "^19.0.0",
+  "react-dom": "^19.0.0"
+},
+"devDependencies": {
+  "prisma": "latest",
+  "typescript": "^5",
+  "tailwindcss": "^4"
+}
 }
