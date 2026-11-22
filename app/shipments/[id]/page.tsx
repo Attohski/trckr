@@ -3,8 +3,8 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { db } from "@/lib/db";
 
-function calcLanded(s: any) {
-  return s.productCostGhs + s.freightGhs + s.dutyGhs;
+function calcProfit(s: any) {
+  return (s.clientQuoteGhs ?? 0) - (s.productCostGhs ?? 0);
 }
 function calcMargin(s: any) {
   return s.clientQuoteGhs - calcLanded(s);

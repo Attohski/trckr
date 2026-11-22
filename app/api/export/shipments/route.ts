@@ -17,22 +17,19 @@ export async function GET() {
   clients.forEach((c: any) => clientMap.set(c.id, c.name));
 
   const rows = shipments.map((s: any) => ({
-    id: s.id,
-    client: clientMap.get(s.clientId) ?? "",
-    goods: s.goods,
-    shippingMark: s.shippingMark,
-    productCostGhs: s.productCostGhs,
-    freightGhs: s.freightGhs,
-    dutyGhs: s.dutyGhs,
-    landedCostGhs: s.productCostGhs + s.freightGhs + s.dutyGhs,
-    clientQuoteGhs: s.clientQuoteGhs,
-    profitGhs: s.clientQuoteGhs - (s.productCostGhs + s.freightGhs + s.dutyGhs),
-    status: s.status,
-    shippedDate: s.shippedDate,
-    deliveredDate: s.deliveredDate,
-    delivered: s.delivered,
-    createdAt: s.createdAt,
-  }));
+  id: s.id,
+  client: clientMap.get(s.clientId) ?? "",
+  goods: s.goods,
+  shippingMark: s.shippingMark,
+  productCostGhs: s.productCostGhs,
+  clientQuoteGhs: s.clientQuoteGhs,
+  profitGhs: (s.clientQuoteGhs ?? 0) - (s.productCostGhs ?? 0),
+  status: s.status,
+  shippedDate: s.shippedDate,
+  deliveredDate: s.deliveredDate,
+  delivered: s.delivered,
+  createdAt: s.createdAt,
+}));
 
   return new Response(toCsv(rows), {
     headers: {

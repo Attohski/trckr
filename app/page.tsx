@@ -3,8 +3,8 @@ export const dynamic = "force-dynamic";
 import { db } from "@/lib/db";
 import { addShipment, addExpense, addPayment } from "./actions";
 
-function calcLanded(s: any) {
-  return s.productCostGhs + s.freightGhs + s.dutyGhs;
+function calcProfit(s: any) {
+  return (s.clientQuoteGhs ?? 0) - (s.productCostGhs ?? 0);
 }
 function calcMargin(s: any) {
   return s.clientQuoteGhs - calcLanded(s);
@@ -83,7 +83,7 @@ export default async function Home() {
               <input name="goods" placeholder="Goods Description" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
               <input name="shippingMark" placeholder="Shipping Mark (optional)" className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
               <input name="productCostGhs" type="number" step="0.01" placeholder="Product Cost (GH₵)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
-              <input name="clientQuoteGhs" type="number" step="0.01" placeholder="Client Quote (GH₵)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
+<input name="clientQuoteGhs" type="number" step="0.01" placeholder="Client Quote (GH₵)" required className="w-full border border-neutral-400 px-3 py-2 text-sm focus:outline-none focus:border-black" />
               <button type="submit" className="w-full bg-black text-white text-sm font-medium px-4 py-2.5 hover:bg-neutral-800 transition-colors">
                 Add Shipment
               </button>

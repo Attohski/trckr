@@ -7,8 +7,8 @@ import ShipmentActions from "../components/ShipmentActions";
 import EditShipmentDialog from "../components/EditShipmentDialog";
 import { deleteShipment } from "../actions";
 
-function calcLanded(s: any) {
-  return s.productCostGhs + s.freightGhs + s.dutyGhs;
+function calcProfit(s: any) {
+  return (s.clientQuoteGhs ?? 0) - (s.productCostGhs ?? 0);
 }
 function calcMargin(s: any) {
   return s.clientQuoteGhs - calcLanded(s);

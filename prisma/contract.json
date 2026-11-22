@@ -325,20 +325,6 @@
                   }
                 }
               },
-              "dutyGhs": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/float8@1",
-                  "kind": "scalar"
-                }
-              },
-              "freightGhs": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/float8@1",
-                  "kind": "scalar"
-                }
-              },
               "goods": {
                 "nullable": false,
                 "type": {
@@ -441,12 +427,6 @@
                 },
                 "deliveredDate": {
                   "column": "deliveredDate"
-                },
-                "dutyGhs": {
-                  "column": "dutyGhs"
-                },
-                "freightGhs": {
-                  "column": "freightGhs"
                 },
                 "goods": {
                   "column": "goods"
@@ -726,16 +706,6 @@
                     "precision": 3
                   }
                 },
-                "dutyGhs": {
-                  "codecId": "pg/float8@1",
-                  "dataType": "pg/float8",
-                  "nullable": false
-                },
-                "freightGhs": {
-                  "codecId": "pg/float8@1",
-                  "dataType": "pg/float8",
-                  "nullable": false
-                },
                 "goods": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -827,7 +797,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "6c83ab59bdf36d52da5afd751883b76c76c4bd88b9480e6916d91922bae855ab"
+    "storageHash": "89e734ff05f89bdc2c66f6deff11b09087bf6d8ee0f772ac2d2a2c2afa3ab155"
   },
   "capabilities": {
     "postgres": {

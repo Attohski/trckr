@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'6c83ab59bdf36d52da5afd751883b76c76c4bd88b9480e6916d91922bae855ab'>;
+  StorageHashBase<'89e734ff05f89bdc2c66f6deff11b09087bf6d8ee0f772ac2d2a2c2afa3ab155'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -342,8 +342,6 @@ export namespace Models {
     createdAt: FieldOutputTypes['public']['Shipment']['createdAt'];
     delivered: FieldOutputTypes['public']['Shipment']['delivered'];
     deliveredDate: FieldOutputTypes['public']['Shipment']['deliveredDate'];
-    dutyGhs: FieldOutputTypes['public']['Shipment']['dutyGhs'];
-    freightGhs: FieldOutputTypes['public']['Shipment']['freightGhs'];
     goods: FieldOutputTypes['public']['Shipment']['goods'];
     id: FieldOutputTypes['public']['Shipment']['id'];
     invoiceUrl: FieldOutputTypes['public']['Shipment']['invoiceUrl'];
@@ -593,18 +591,6 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-date@1';
                   readonly nullable: true;
                   readonly typeParams: { readonly precision: 3 };
-                  readonly many: false;
-                };
-                readonly dutyGhs: {
-                  readonly dataType: 'pg/float8';
-                  readonly codecId: 'pg/float8@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly freightGhs: {
-                  readonly dataType: 'pg/float8';
-                  readonly codecId: 'pg/float8@1';
-                  readonly nullable: false;
                   readonly many: false;
                 };
                 readonly goods: {
@@ -903,14 +889,6 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly precision: 3 };
                 };
               };
-              readonly dutyGhs: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
-              };
-              readonly freightGhs: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
-              };
               readonly goods: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -978,8 +956,6 @@ type ContractBase = Omit<
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly delivered: { readonly column: 'delivered' };
                 readonly deliveredDate: { readonly column: 'deliveredDate' };
-                readonly dutyGhs: { readonly column: 'dutyGhs' };
-                readonly freightGhs: { readonly column: 'freightGhs' };
                 readonly goods: { readonly column: 'goods' };
                 readonly id: { readonly column: 'id' };
                 readonly invoiceUrl: { readonly column: 'invoiceUrl' };

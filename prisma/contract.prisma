@@ -17,8 +17,6 @@ model Shipment {
   goods          String
   shippingMark   String?
   productCostGhs Float
-  freightGhs     Float
-  dutyGhs        Float
   clientQuoteGhs Float
   status         String    @default("Quoted")
   shippedDate    DateTime?
