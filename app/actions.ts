@@ -69,7 +69,6 @@ export async function updateShipment(formData: FormData) {
     goods: formData.get('goods') as string,
     shippingMark: (formData.get('shippingMark') as string) || null,
     productCostGhs: parseFloat(formData.get('productCostGhs') as string),
-    exchangeRate: parseFloat(formData.get('exchangeRate') as string),
     freightGhs: parseFloat(formData.get('freightGhs') as string),
     dutyGhs: parseFloat(formData.get('dutyGhs') as string),
     clientQuoteGhs: parseFloat(formData.get('clientQuoteGhs') as string),
