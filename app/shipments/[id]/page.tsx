@@ -6,9 +6,6 @@ import { db } from "@/lib/db";
 function calcProfit(s: any) {
   return (s.clientQuoteGhs ?? 0) - (s.productCostGhs ?? 0);
 }
-function calcMargin(s: any) {
-  return s.clientQuoteGhs - calcLanded(s);
-}
 
 export default async function ShipmentDetailPage({
   params,
@@ -31,8 +28,7 @@ export default async function ShipmentDetailPage({
   const expenses = await db.orm.public.Expense.where({ shipmentId }).all();
   const payments = await db.orm.public.Payment.where({ clientId: shipment.clientId }).all();
 
-  const landed = calcLanded(shipment);
-  const profit = calcMargin(shipment);
+  const profit = calcProfit(shipment);
   const totalExpenses = expenses.reduce((sum: number, e: any) => sum + e.amountGhs, 0);
   const totalPaid = payments.reduce((sum: number, p: any) => sum + p.amountGhs, 0);
 
@@ -50,10 +46,6 @@ export default async function ShipmentDetailPage({
         <div className="border border-black p-4">
           <p className="text-xs uppercase tracking-widest text-neutral-500">Client</p>
           <p className="font-medium mt-1">{clientName}</p>
-        </div>
-        <div className="border border-black p-4">
-          <p className="text-xs uppercase tracking-widest text-neutral-500">Landed Cost</p>
-          <p className="font-semibold tabular-nums mt-1">GH₵ {landed.toFixed(2)}</p>
         </div>
         <div className="border border-black p-4">
           <p className="text-xs uppercase tracking-widest text-neutral-500">Quote</p>
@@ -75,18 +67,10 @@ export default async function ShipmentDetailPage({
   <dt className="text-neutral-500">Product Cost</dt>
   <dd className="tabular-nums">GH₵ {shipment.productCostGhs.toFixed(2)}</dd>
 </div>
-          <div className="flex justify-between px-5 py-3">
-            <dt className="text-neutral-500">Freight</dt>
-            <dd className="tabular-nums">GH₵ {shipment.freightGhs.toFixed(2)}</dd>
-          </div>
-          <div className="flex justify-between px-5 py-3">
-            <dt className="text-neutral-500">Duty / Clearing</dt>
-            <dd className="tabular-nums">GH₵ {shipment.dutyGhs.toFixed(2)}</dd>
-          </div>
-          <div className="flex justify-between px-5 py-3 font-semibold">
-            <dt>Landed Cost</dt>
-            <dd className="tabular-nums">GH₵ {landed.toFixed(2)}</dd>
-          </div>
+<div className="flex justify-between px-5 py-3 font-semibold">
+  <dt>Client Quote</dt>
+  <dd className="tabular-nums">GH₵ {shipment.clientQuoteGhs.toFixed(2)}</dd>
+</div>
         </dl>
       </div>
 

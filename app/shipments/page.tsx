@@ -10,9 +10,6 @@ import { deleteShipment } from "../actions";
 function calcProfit(s: any) {
   return (s.clientQuoteGhs ?? 0) - (s.productCostGhs ?? 0);
 }
-function calcMargin(s: any) {
-  return s.clientQuoteGhs - calcLanded(s);
-}
 
 export default async function ShipmentsPage({
   searchParams,
@@ -88,7 +85,6 @@ export default async function ShipmentsPage({
               <th className="px-4 py-3 font-medium">Client</th>
               <th className="px-4 py-3 font-medium">Goods</th>
               <th className="px-4 py-3 font-medium">Shipping Mark</th>
-              <th className="px-4 py-3 font-medium text-right">Landed (GH₵)</th>
               <th className="px-4 py-3 font-medium text-right">Quote (GH₵)</th>
               <th className="px-4 py-3 font-medium text-right">Profit (GH₵)</th>
               <th className="px-4 py-3 font-medium">Shipped</th>
@@ -100,8 +96,7 @@ export default async function ShipmentsPage({
           </thead>
           <tbody>
             {shipments.map((s: any) => {
-              const landed = calcLanded(s);
-              const profit = calcMargin(s);
+              const profit = calcProfit(s);
               return (
                 <tr key={s.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
                   <td className="px-4 py-3 font-medium">{clientMap.get(s.clientId) ?? "—"}</td>
@@ -111,7 +106,6 @@ export default async function ShipmentsPage({
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-neutral-600">{s.shippingMark || "—"}</td>
-                  <td className="px-4 py-3 text-right tabular-nums text-neutral-600">{landed.toFixed(2)}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-neutral-600">{s.clientQuoteGhs.toFixed(2)}</td>
                   <td className="px-4 py-3 text-right tabular-nums font-semibold">{profit.toFixed(2)}</td>
                   <td className="px-4 py-3 text-xs text-neutral-600">

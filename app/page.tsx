@@ -6,9 +6,6 @@ import { addShipment, addExpense, addPayment } from "./actions";
 function calcProfit(s: any) {
   return (s.clientQuoteGhs ?? 0) - (s.productCostGhs ?? 0);
 }
-function calcMargin(s: any) {
-  return s.clientQuoteGhs - calcLanded(s);
-}
 
 export default async function Home() {
   const shipments = await db.orm.public.Shipment.orderBy((s) => s.createdAt.desc()).all();
@@ -19,7 +16,7 @@ export default async function Home() {
   const clientMap = new Map<number, string>();
   clients.forEach((c: any) => clientMap.set(c.id, c.name));
 
-  const grossProfit = shipments.reduce((sum, s) => sum + calcMargin(s), 0);
+  const grossProfit = shipments.reduce((sum, s) => sum + calcProfit(s), 0);
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amountGhs, 0);
   const totalPayments = payments.reduce((sum, p) => sum + p.amountGhs, 0);
   const netProfit = grossProfit - totalExpenses;
@@ -140,7 +137,6 @@ export default async function Home() {
                   <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-widest text-neutral-500">
                     <th className="px-5 py-3 font-medium">Client</th>
                     <th className="px-5 py-3 font-medium">Goods</th>
-                    <th className="px-5 py-3 font-medium text-right">Landed (GH₵)</th>
                     <th className="px-5 py-3 font-medium text-right">Quote (GH₵)</th>
                     <th className="px-5 py-3 font-medium text-right">Profit (GH₵)</th>
                     <th className="px-5 py-3 font-medium">Status</th>
@@ -148,13 +144,11 @@ export default async function Home() {
                 </thead>
                 <tbody>
                   {shipments.map((s: any) => {
-                    const landed = calcLanded(s);
-                    const profit = calcMargin(s);
+                    const profit = calcProfit(s);
                     return (
                       <tr key={s.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
                         <td className="px-5 py-3 font-medium">{clientMap.get(s.clientId) ?? "—"}</td>
                         <td className="px-5 py-3 text-neutral-600">{s.goods}</td>
-                        <td className="px-5 py-3 text-right tabular-nums text-neutral-600">{landed.toFixed(2)}</td>
                         <td className="px-5 py-3 text-right tabular-nums text-neutral-600">{s.clientQuoteGhs.toFixed(2)}</td>
                         <td className="px-5 py-3 text-right tabular-nums font-semibold">{profit.toFixed(2)}</td>
                         <td className="px-5 py-3">
